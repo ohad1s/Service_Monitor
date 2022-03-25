@@ -1,5 +1,6 @@
 import os
 import platform
+import sys
 import threading
 from _datetime import datetime
 import time
@@ -146,8 +147,72 @@ def o_s():
     else:
         runUbuntu()
 
-
+############################### main #########################################
 if __name__ == '__main__':
+    if (len(sys.argv) <= 1):
+        raise "Mode was not selected Error!\n please choose: monitor or manual"
+        # print("Choose mode: monitor or manual")
+        # exit()
+    # Monitor mode
+    if ("monitor" == sys.argv[1]):
+        if (len(sys.argv) <= 2):
+            raise "Time not selected Error!\n please enter how much seconds to refresh monitor"
+            # print("Enter how much seconds to refresh monitor")
+            # exit()
+        # Get seconds
+        seconds = sys.argv[2]
+        str = "> Monitor mode: Refresh rate of {} seconds".format(seconds)
+        print(str)
+
+        initFiles()
+        platform = platform.system()
+        status_log = open(STATUS_LOG_FILE, "a")
+        log_file = open(SERVICE_LIST_FILE, "a")
+        ###################################### Windows Platform ######################################
+        if (platform == "Windows"):
+            print("> Windows detected")
+            dict = Win_SampleToLog(log_file)
+            while True:
+                my_dict = Win_SampleToLog(open(SERVICE_LIST_FILE, "a"))
+                time.sleep(float(seconds))
+                my_dict2 = Win_SampleToLog(open(SERVICE_LIST_FILE, "a"))
+                DiffSamples(status_log, my_dict, my_dict2, platform)
+
+
+
+        ###################################### Linux Platform ######################################
+        else:
+            print("> Linux detected")
+            dict = Linux_SampleToLog(log_file)
+            while True:
+                my_dict = Linux_SampleToLog(open(SERVICE_LIST_FILE, "a"))
+                time.sleep(float(seconds))
+                my_dict2 = Linux_SampleToLog(open(SERVICE_LIST_FILE, "a"))
+                DiffSamples(status_log, my_dict, my_dict2, platform)
+
+    elif ("manual" == sys.argv[1]):
+        print("> Manual mode")
+        if (len(sys.argv) <= 5):
+            print("Please enter 2 dates for sample range")
+            exit()
+        txt_date1 = sys.argv[2] + " " + sys.argv[3]
+        txt_date2 = sys.argv[4] + " " + sys.argv[5]
+
+        date1 = validDate(txt_date1)
+        date2 = validDate(txt_date2)
+        if date1 == False or date2 == False:
+            print("Please try again")
+            exit()
+
+        # Success, now search the correct sampleings
+        lines = filterStatusLogByDates(date1, date2)
+        print("> Total events found: " + str(len(lines)))
+        for line in lines:
+            print(line)
+
+    else:
+        print("Use 'manual' or 'monitor' mode")
+        exit()
 
 
 
