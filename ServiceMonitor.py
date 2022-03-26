@@ -12,6 +12,7 @@ STATUS_LOG_FILE = "status_log.log"
 
 ###################### Windows method ####################################################
 def runWindows():
+    print("win")
     command = "Get-Service | Export-Csv -Path ./service.csv"
     completed = subprocess.run(["powershell", "-Command", command], capture_output=True)
     if completed.returncode != 0:
@@ -21,6 +22,7 @@ def runWindows():
 
 ####################### Linux method ####################################################
 def runUbuntu():
+    print("ub")
     os.system("systemctl list-units --type=service |awk '{print $1,$4}' | sed -E 's/ +/,/g' > service.csv")
 
 ############################# sample ########################################
@@ -58,7 +60,7 @@ def sample_diff(log_file, sample1, sample2):
 
 ########################### o_s ########################################################
 def o_s():
-    if platform == "Windows":
+    if platform.system() == "Windows":
         runWindows()
     else:
         runUbuntu()
