@@ -2,6 +2,7 @@ import os
 import platform
 import re
 import sys
+import datetime
 from _datetime import datetime
 import time
 import subprocess
@@ -9,6 +10,15 @@ from csv import reader
 
 SERVICE_LIST_FILE = "service_list.log"
 STATUS_LOG_FILE = "status_log.log"
+TIMESTMPS_LIST_FILE= "time_stmp_list.log"
+TIMESTMPS_DIFF_FILE= "time_stmp_diff.log"
+
+######################## init time stmp file #################################
+def init_time_File():
+    if not os.path.exists(TIMESTMPS_DIFF_FILE):
+        open(TIMESTMPS_DIFF_FILE, "w").close()
+    if not os.path.exists(TIMESTMPS_LIST_FILE):
+        open(TIMESTMPS_LIST_FILE, "w").close()
 
 ###################### Windows method ####################################################
 def runWindows():
@@ -39,8 +49,12 @@ def sample(log_file):
         service_status = services_data[i][11]
         line_to_write = "{} {}\n".format(service_name, service_status)
         log_file.write(line_to_write)
-        # log_file.write("\n")
         dict[service_name] = service_status
+    init_time_File()
+    time_list_file= open(TIMESTMPS_LIST_FILE,"w")
+    datestmp= datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+    time_list_file.write(datestmp)
+    time_list_file.close()
     log_file.close()
     return dict
 
@@ -57,6 +71,12 @@ def sample_diff(log_file, sample1, sample2):
             str = "{}: Service '{}' changed status from '{}' to '{}'".format(date, service_, status_, sample2[service_])
             print(str)
             log_file.write(str + "\n")
+    init_time_File()
+    diff_file= open(TIMESTMPS_DIFF_FILE,"w")
+    datestmp= datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+    diff_file.write(datestmp)
+    diff_file.close()
+    log_file.close()
 
 ########################### o_s ########################################################
 def o_s():
