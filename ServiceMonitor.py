@@ -22,7 +22,6 @@ def init_time_File():
 
 ###################### Windows method ####################################################
 def runWindows():
-    print("win")
     command = "Get-Service | Export-Csv -Path ./service.csv"
     completed = subprocess.run(["powershell", "-Command", command], capture_output=True)
     if completed.returncode != 0:
@@ -32,8 +31,8 @@ def runWindows():
 
 ####################### Linux method ####################################################
 def runUbuntu():
-    print("ub")
     os.system("systemctl list-units --type=service |awk '{print $1,$4}' | sed -E 's/ +/,/g' > service.csv")
+    print("csv successfully created / updated!")
 
 ############################# sample ########################################
 def sample(log_file):
@@ -45,8 +44,12 @@ def sample(log_file):
     date_ = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     log_file.write("---------------------" + date_ + "--------------------------\n")
     for i in range(2, len(services_data) - 1):
-        service_name = services_data[i][8]
-        service_status = services_data[i][11]
+        if platform.system() == "Windows":
+            service_name = services_data[i][8]
+            service_status = services_data[i][11]
+        else:
+            service_name = services_data[i][0]
+            service_status = services_data[i][1]
         line_to_write = "{} {}\n".format(service_name, service_status)
         log_file.write(line_to_write)
         dict[service_name] = service_status

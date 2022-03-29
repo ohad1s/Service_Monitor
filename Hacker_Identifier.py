@@ -46,12 +46,10 @@ def Hacker_Identifier():
         print(date_)
         print(datetime.datetime.fromtimestamp(last_modif_list))
         if date_ > datetime.datetime.fromtimestamp(last_modif_list):
-            print("im here")
             Email_Sending()
     for line in fp2:
         date_=datetime.datetime.strptime(line,"%m/%d/%Y %H:%M:%S")
         if date_ > datetime.datetime.fromtimestamp(last_modif_diff):
-            print("im here2")
             Email_Sending()
 
 Hacker_Identifier()
